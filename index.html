@@ -16,7 +16,7 @@
         label { font-size: 0.8rem; color: #94a3b8; margin-bottom: 4px; display: block; }
         .btn { width: 100%; padding: 14px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .btn-primary { background: var(--primary); color: white; }
-        .url-display { background: rgba(59, 130, 246, 0.1); padding: 15px; border-radius: 10px; color: #60a5fa; font-size: 0.8rem; border: 1px dashed var(--primary); text-align: center; margin-bottom: 20px; }
+        .url-display { background: rgba(59, 130, 246, 0.1); padding: 15px; border-radius: 10px; color: #60a5fa; font-size: 0.8rem; border: 1px dashed var(--primary); text-align: center; margin-bottom: 20px; word-break: break-all; }
         .link-item { background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 10px; }
     </style>
 </head>
@@ -37,12 +37,12 @@
         </div>
 
         <div class="url-display">
-            <p style="font-size: 0.7rem; color: #94a3b8; margin-bottom: 5px;">COPIE ESTE LINK PARA O INSTAGRAM:</p>
-            <strong id="final-link">Gerando...</strong>
+            <p style="font-size: 0.7rem; color: #94a3b8; margin-bottom: 5px;">LINK DA SUA BIO:</p>
+            <strong id="final-link">A carregar...</strong>
         </div>
 
         <label>Foto do Perfil (URL)</label>
-        <input type="text" id="p-img" placeholder="https://...">
+        <input type="text" id="p-img" placeholder="Link da imagem">
         
         <label>Nome</label>
         <input type="text" id="p-name">
@@ -51,16 +51,16 @@
         <textarea id="p-desc" rows="2"></textarea>
 
         <label>Barra de Urgência (Topo)</label>
-        <input type="text" id="p-urgency" placeholder="Ex: 🔥 Últimas vagas com 50% OFF!">
+        <input type="text" id="p-urgency" placeholder="Ex: 🔥 Promoção termina hoje!">
 
-        <label>WhatsApp Flutuante (Apenas números com DDD)</label>
-        <input type="text" id="p-whatsapp" placeholder="Ex: 5511999999999">
+        <label>WhatsApp Flutuante (Ex: 5511999999999)</label>
+        <input type="text" id="p-whatsapp" placeholder="Apenas números com DDD">
 
-        <label>Cor do Brilho Neon (Aura)</label>
+        <label>Cor do Brilho (Aura)</label>
         <input type="color" id="p-color" value="#3b82f6" style="height:45px; cursor:pointer;">
 
         <div style="display:flex; justify-content:space-between; align-items:center; margin:15px 0;">
-            <span>Links Sociais</span>
+            <span>Links</span>
             <button class="btn" id="add-link" style="width:auto; padding:5px 15px; background:#1f2937; color:white;">+ Novo</button>
         </div>
         <div id="links-container"></div>
@@ -91,7 +91,6 @@
         if (user) {
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('editor-screen').classList.remove('hidden');
-            // ATENÇÃO: Verifique se o caminho no GitHub Pages está correto (BioPro ou raiz)
             document.getElementById('final-link').innerText = `${window.location.origin}${window.location.pathname.replace('admin.html', 'index.html')}?u=${user.uid}`;
             loadData(user.uid);
         } else {
@@ -109,13 +108,12 @@
                     <option value="fab fa-instagram" ${icon.includes('instagram')?'selected':''}>Instagram</option>
                     <option value="fab fa-whatsapp" ${icon.includes('whatsapp')?'selected':''}>WhatsApp</option>
                     <option value="fab fa-tiktok" ${icon.includes('tiktok')?'selected':''}>TikTok</option>
-                    <option value="fab fa-youtube" ${icon.includes('youtube')?'selected':''}>YouTube</option>
-                    <option value="fas fa-link" ${icon.includes('link')?'selected':''}>Outro Link</option>
+                    <option value="fas fa-link" ${icon.includes('link')?'selected':''}>Link</option>
                 </select>
                 <input type="text" class="l-label" placeholder="Título" value="${label}" style="flex:2; margin:0">
-                <button onclick="this.parentElement.parentElement.remove()" style="color:red; background:none; border:none; font-weight:bold;">X</button>
+                <button onclick="this.parentElement.parentElement.remove()" style="color:red; background:none; border:none;">X</button>
             </div>
-            <input type="text" class="l-url" placeholder="URL (https://...)" value="${url}" style="margin:0">
+            <input type="text" class="l-url" placeholder="URL" value="${url}" style="margin:0">
         `;
         document.getElementById('links-container').appendChild(div);
     }
@@ -137,33 +135,29 @@
 
     document.getElementById('save-btn').onclick = async () => {
         const user = auth.currentUser;
-        const btn = document.getElementById('save-btn');
-        btn.innerText = "⏳ Publicando...";
         const links = Array.from(document.querySelectorAll('.link-item')).map(it => ({
             label: it.querySelector('.l-label').value,
             url: it.querySelector('.l-url').value,
             icon: it.querySelector('.l-icon').value
         }));
-        try {
-            await setDoc(doc(db, "users", user.uid), {
-                name: document.getElementById('p-name').value,
-                desc: document.getElementById('p-desc').value,
-                img: document.getElementById('p-img').value,
-                color: document.getElementById('p-color').value,
-                urgency: document.getElementById('p-urgency').value,
-                whatsapp: document.getElementById('p-whatsapp').value,
-                links: links
-            });
-            alert("✅ Bio atualizada com sucesso!");
-            location.reload();
-        } catch(e) { alert("Erro ao salvar: " + e.message); }
+        await setDoc(doc(db, "users", user.uid), {
+            name: document.getElementById('p-name').value,
+            desc: document.getElementById('p-desc').value,
+            img: document.getElementById('p-img').value,
+            color: document.getElementById('p-color').value,
+            urgency: document.getElementById('p-urgency').value,
+            whatsapp: document.getElementById('p-whatsapp').value,
+            links: links
+        });
+        alert("✅ Publicado!");
+        location.reload();
     };
 
     document.getElementById('btn-auth').onclick = async () => {
         const email = document.getElementById('email').value;
         const pass = document.getElementById('pass').value;
         try { await signInWithEmailAndPassword(auth, email, pass); }
-        catch { try { await createUserWithEmailAndPassword(auth, email, pass); } catch(e) { alert(e.message); } }
+        catch { await createUserWithEmailAndPassword(auth, email, pass); }
     };
     document.getElementById('btn-logout').onclick = () => signOut(auth);
     document.getElementById('add-link').onclick = () => addLinkField();
