@@ -3,25 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Bio | PowerCare Pro</title>
+    <title>PowerCare Admin | Multi-User</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --bg: #030712; --card: #111827; --border: #1f2937; --primary: #3b82f6; --text: #f9fafb; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); color: var(--text); padding: 20px; display: flex; justify-content: center; min-height: 100vh; }
         .container { width: 100%; max-width: 500px; }
-        .box { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 25px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .box { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 25px; margin-bottom: 20px; }
         .hidden { display: none; }
-        input, select, textarea { width: 100%; background: #030712; border: 1px solid var(--border); border-radius: 10px; padding: 12px; color: white; margin-bottom: 15px; outline: none; }
+        input, textarea { width: 100%; background: #030712; border: 1px solid var(--border); border-radius: 10px; padding: 12px; color: white; margin-bottom: 15px; outline: none; }
         label { font-size: 0.75rem; color: #94a3b8; margin-bottom: 5px; display: block; font-weight: 600; text-transform: uppercase; }
-        .btn { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 1rem; }
+        .btn { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .btn-primary { background: var(--primary); color: white; }
-        .btn-primary:hover { background: #2563eb; transform: translateY(-2px); }
         
-        /* ÁREA DO LINK GERADO */
-        .url-display { background: rgba(59, 130, 246, 0.1); padding: 20px; border-radius: 15px; color: #fff; font-size: 0.9rem; border: 2px dashed var(--primary); text-align: center; margin-bottom: 25px; cursor: pointer; transition: 0.2s; }
-        .url-display:hover { background: rgba(59, 130, 246, 0.2); }
-        .url-display small { display: block; color: #94a3b8; margin-bottom: 8px; font-size: 0.7rem; text-transform: uppercase; }
+        /* CAIXA DO LINK PÚBLICO */
+        .url-display { 
+            background: rgba(59, 130, 246, 0.1); padding: 20px; border-radius: 15px; 
+            border: 2px dashed var(--primary); text-align: center; margin-bottom: 25px; 
+            cursor: pointer; transition: 0.2s;
+        }
+        .url-display:hover { background: rgba(59, 130, 246, 0.15); }
+        .url-display small { display: block; color: #94a3b8; margin-bottom: 8px; font-size: 0.7rem; }
         .link-item { background: rgba(255,255,255,0.03); padding: 15px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 12px; }
     </style>
 </head>
@@ -29,21 +32,21 @@
 
 <div class="container">
     <div id="auth-screen" class="box">
-        <h2 style="margin-bottom: 20px; text-align: center;">Bio Pro Login</h2>
+        <h2 style="margin-bottom: 20px; text-align: center;">Entrar no Editor</h2>
         <input type="email" id="email" placeholder="E-mail">
         <input type="password" id="pass" placeholder="Senha">
-        <button class="btn btn-primary" id="btn-auth">Entrar / Cadastrar</button>
+        <button class="btn btn-primary" id="btn-auth">Entrar / Criar Conta</button>
     </div>
 
     <div id="editor-screen" class="box hidden">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
             <h3 style="color: var(--primary)">Editor PowerCare</h3>
-            <button id="btn-logout" style="color:#ff4444; background:none; border:none; cursor:pointer; font-weight:600;">Sair</button>
+            <button id="btn-logout" style="color:#ff4444; background:none; border:none; cursor:pointer;">Sair</button>
         </div>
 
-        <div class="url-display" id="copy-link-btn" title="Clique para copiar">
-            <small>Seu Link Público (Clique para copiar):</small>
-            <strong id="final-link" style="color: #60a5fa; word-break: break-all;">Gerando link...</strong>
+        <div class="url-display" id="copy-link-btn">
+            <small>ESTE É O LINK PARA A SUA BIO (CLIQUE PARA COPIAR):</small>
+            <strong id="final-link" style="color: #60a5fa; word-break: break-all; font-size: 0.85rem;">Gerando...</strong>
         </div>
 
         <label>Foto de Perfil (URL)</label>
@@ -59,15 +62,15 @@
         <input type="text" id="p-whatsapp">
 
         <label>Cor do Tema</label>
-        <input type="color" id="p-color" value="#3b82f6" style="height:50px; cursor:pointer;">
+        <input type="color" id="p-color" value="#3b82f6" style="height:50px; width:100%; cursor:pointer; background:none; border:none;">
 
         <div style="display:flex; justify-content:space-between; align-items:center; margin:20px 0 10px;">
-            <span style="font-weight:bold">Links da Bio</span>
+            <span style="font-weight:bold">Links da Página</span>
             <button class="btn" id="add-link" style="width:auto; padding:8px 15px; background:var(--primary); color:white; font-size:0.8rem;">+ Novo Link</button>
         </div>
         <div id="links-container"></div>
 
-        <button class="btn btn-primary" id="save-btn" style="margin-top:20px;">🚀 Publicar Alterações</button>
+        <button class="btn btn-primary" id="save-btn" style="margin-top:20px;">🚀 Guardar Alterações</button>
     </div>
 </div>
 
@@ -94,17 +97,13 @@
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('editor-screen').classList.remove('hidden');
             
-            // LÓGICA DE GERAÇÃO DO LINK CORRETO
-            const currentURL = window.location.href;
-            const baseURL = currentURL.substring(0, currentURL.lastIndexOf('/') + 1);
-            const publicLink = `${baseURL}index.html?u=${user.uid}`;
+            // LÓGICA DO LINK PÚBLICO
+            const publicUrl = window.location.origin + window.location.pathname.replace('admin.html', 'index.html') + `?u=${user.uid}`;
+            document.getElementById('final-link').innerText = publicUrl;
             
-            document.getElementById('final-link').innerText = publicLink;
-            
-            // Botão de copiar
             document.getElementById('copy-link-btn').onclick = () => {
-                navigator.clipboard.writeText(publicLink);
-                alert("Link copiado com sucesso!");
+                navigator.clipboard.writeText(publicUrl);
+                alert("Link público copiado! Use este link na sua Bio.");
             };
 
             loadData(user.uid);
@@ -114,15 +113,15 @@
         }
     });
 
-    window.addLinkField = (label = "", url = "", icon = "fas fa-link") => {
+    window.addLinkField = (label = "", url = "") => {
         const div = document.createElement('div');
         div.className = 'link-item';
         div.innerHTML = `
-            <div style="display:flex; gap:8px; margin-bottom:8px;">
-                <input type="text" class="l-label" placeholder="Título" value="${label}" style="flex:2; margin:0">
-                <button onclick="this.parentElement.parentElement.remove()" style="color:#ff4444; background:none; border:none; cursor:pointer;">X</button>
+            <input type="text" class="l-label" placeholder="Nome do Botão" value="${label}" style="margin-bottom:8px">
+            <div style="display:flex; gap:8px;">
+                <input type="text" class="l-url" placeholder="URL (https://...)" value="${url}" style="margin:0; flex:1">
+                <button onclick="this.parentElement.parentElement.remove()" style="color:#ff4444; background:none; border:none; cursor:pointer; font-weight:bold;">X</button>
             </div>
-            <input type="text" class="l-url" placeholder="URL (https://...)" value="${url}" style="margin:0">
         `;
         document.getElementById('links-container').appendChild(div);
     }
@@ -145,8 +144,7 @@
         const user = auth.currentUser;
         const links = Array.from(document.querySelectorAll('.link-item')).map(it => ({
             label: it.querySelector('.l-label').value,
-            url: it.querySelector('.l-url').value,
-            icon: "fas fa-link"
+            url: it.querySelector('.l-url').value
         }));
         await setDoc(doc(db, "users", user.uid), {
             name: document.getElementById('p-name').value,
@@ -156,7 +154,7 @@
             whatsapp: document.getElementById('p-whatsapp').value,
             links: links
         });
-        alert("✅ Alterações publicadas!");
+        alert("✅ Publicado com sucesso!");
     };
 
     document.getElementById('btn-auth').onclick = async () => {
