@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Bio | PowerCare</title>
+    <title>Admin Bio | PowerCare Pro</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --bg: #030712; --card: #111827; --border: #1f2937; --primary: #3b82f6; --text: #f9fafb; }
@@ -12,7 +12,8 @@
         .container { width: 100%; max-width: 450px; }
         .box { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 20px; }
         .hidden { display: none; }
-        input, select, textarea { width: 100%; background: #030712; border: 1px solid var(--border); border-radius: 8px; padding: 12px; color: white; margin-bottom: 10px; outline: none; }
+        input, select, textarea { width: 100%; background: #030712; border: 1px solid var(--border); border-radius: 8px; padding: 12px; color: white; margin-bottom: 12px; outline: none; }
+        label { font-size: 0.8rem; color: #94a3b8; margin-bottom: 4px; display: block; }
         .btn { width: 100%; padding: 14px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .btn-primary { background: var(--primary); color: white; }
         .url-display { background: rgba(59, 130, 246, 0.1); padding: 15px; border-radius: 10px; color: #60a5fa; font-size: 0.8rem; border: 1px dashed var(--primary); text-align: center; margin-bottom: 20px; }
@@ -23,7 +24,7 @@
 
 <div class="container">
     <div id="auth-screen" class="box">
-        <h2>Acesse sua Bio</h2>
+        <h2>Acesse sua Bio Pro</h2>
         <input type="email" id="email" placeholder="E-mail">
         <input type="password" id="pass" placeholder="Senha">
         <button class="btn btn-primary" id="btn-auth">Entrar / Cadastrar</button>
@@ -31,12 +32,12 @@
 
     <div id="editor-screen" class="box hidden">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h3>Configurações</h3>
+            <h3>PowerCare Editor</h3>
             <button id="btn-logout" style="color:#ff4444; background:none; border:none; cursor:pointer;">Sair</button>
         </div>
 
         <div class="url-display">
-            <p style="font-size: 0.7rem; color: #94a3b8; margin-bottom: 5px;">COPIE PARA O INSTAGRAM:</p>
+            <p style="font-size: 0.7rem; color: #94a3b8; margin-bottom: 5px;">LINK PARA SUA BIO:</p>
             <strong id="final-link">Gerando...</strong>
         </div>
 
@@ -45,19 +46,26 @@
         
         <label>Nome</label>
         <input type="text" id="p-name">
-        <label>Bio</label>
+        
+        <label>Bio (Descrição)</label>
         <textarea id="p-desc" rows="2"></textarea>
+
+        <label>Texto de Urgência (Topo da página)</label>
+        <input type="text" id="p-urgency" placeholder="Ex: 🔥 Últimas vagas com desconto!">
+
+        <label>WhatsApp Flutuante (Apenas números com DDD)</label>
+        <input type="text" id="p-whatsapp" placeholder="Ex: 5511999999999">
 
         <label>Cor do Brilho Neon</label>
         <input type="color" id="p-color" value="#3b82f6" style="height:45px; cursor:pointer;">
 
         <div style="display:flex; justify-content:space-between; align-items:center; margin:15px 0;">
-            <span>Seus Links</span>
-            <button class="btn" id="add-link" style="width:auto; padding:5px 15px; background:#1f2937; color:white;">+ Adicionar</button>
+            <span>Links da Bio</span>
+            <button class="btn" id="add-link" style="width:auto; padding:5px 15px; background:#1f2937; color:white;">+ Novo</button>
         </div>
         <div id="links-container"></div>
 
-        <button class="btn btn-primary" id="save-btn" style="margin-top:20px;">🚀 Salvar e Publicar</button>
+        <button class="btn btn-primary" id="save-btn" style="margin-top:20px;">🚀 Publicar Alterações</button>
     </div>
 </div>
 
@@ -119,6 +127,8 @@
             document.getElementById('p-desc').value = d.desc || "";
             document.getElementById('p-img').value = d.img || "";
             document.getElementById('p-color').value = d.color || "#3b82f6";
+            document.getElementById('p-urgency').value = d.urgency || "";
+            document.getElementById('p-whatsapp').value = d.whatsapp || "";
             document.getElementById('links-container').innerHTML = "";
             (d.links || []).forEach(l => addLinkField(l.label, l.url, l.icon));
         } else { addLinkField(); }
@@ -138,9 +148,11 @@
             desc: document.getElementById('p-desc').value,
             img: document.getElementById('p-img').value,
             color: document.getElementById('p-color').value,
+            urgency: document.getElementById('p-urgency').value,
+            whatsapp: document.getElementById('p-whatsapp').value,
             links: links
         });
-        alert("✅ Bio atualizada!");
+        alert("✅ Bio atualizada com sucesso!");
         location.reload();
     };
 
