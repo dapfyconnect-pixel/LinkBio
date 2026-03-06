@@ -8,7 +8,7 @@
     <style>
         :root { --bg: #030712; --card: #111827; --border: #1f2937; --primary: #3b82f6; --text: #f9fafb; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); color: var(--text); padding: 20px; display: flex; justify-content: center; }
+        body { background: var(--bg); color: var(--text); padding: 20px; display: flex; justify-content: center; min-height: 100vh; }
         .container { width: 100%; max-width: 500px; }
         .box { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 25px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
         .hidden { display: none; }
@@ -16,8 +16,11 @@
         label { font-size: 0.75rem; color: #94a3b8; margin-bottom: 5px; display: block; font-weight: 600; text-transform: uppercase; }
         .btn { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 1rem; }
         .btn-primary { background: var(--primary); color: white; }
-        .url-display { background: rgba(59, 130, 246, 0.1); padding: 20px; border-radius: 15px; color: #fff; font-size: 0.9rem; border: 2px dashed var(--primary); text-align: center; margin-bottom: 25px; cursor: pointer; position: relative; }
-        .url-display:active { transform: scale(0.98); }
+        .btn-primary:hover { background: #2563eb; transform: translateY(-2px); }
+        
+        /* ÁREA DO LINK GERADO */
+        .url-display { background: rgba(59, 130, 246, 0.1); padding: 20px; border-radius: 15px; color: #fff; font-size: 0.9rem; border: 2px dashed var(--primary); text-align: center; margin-bottom: 25px; cursor: pointer; transition: 0.2s; }
+        .url-display:hover { background: rgba(59, 130, 246, 0.2); }
         .url-display small { display: block; color: #94a3b8; margin-bottom: 8px; font-size: 0.7rem; text-transform: uppercase; }
         .link-item { background: rgba(255,255,255,0.03); padding: 15px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 12px; }
     </style>
@@ -26,48 +29,45 @@
 
 <div class="container">
     <div id="auth-screen" class="box">
-        <h2 style="margin-bottom: 20px;">Aceder Bio Pro</h2>
+        <h2 style="margin-bottom: 20px; text-align: center;">Bio Pro Login</h2>
         <input type="email" id="email" placeholder="E-mail">
         <input type="password" id="pass" placeholder="Senha">
-        <button class="btn btn-primary" id="btn-auth">Entrar</button>
+        <button class="btn btn-primary" id="btn-auth">Entrar / Cadastrar</button>
     </div>
 
     <div id="editor-screen" class="box hidden">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h3 style="color: var(--primary)">PowerCare Editor</h3>
+            <h3 style="color: var(--primary)">Editor PowerCare</h3>
             <button id="btn-logout" style="color:#ff4444; background:none; border:none; cursor:pointer; font-weight:600;">Sair</button>
         </div>
 
-        <div class="url-display" id="copy-link-btn">
-            <small>Clique para copiar o link da sua Bio:</small>
-            <strong id="final-link" style="color: #60a5fa; word-break: break-all;">A carregar...</strong>
+        <div class="url-display" id="copy-link-btn" title="Clique para copiar">
+            <small>Seu Link Público (Clique para copiar):</small>
+            <strong id="final-link" style="color: #60a5fa; word-break: break-all;">Gerando link...</strong>
         </div>
 
-        <label>Foto do Perfil (URL)</label>
-        <input type="text" id="p-img" placeholder="https://imagem.jpg">
+        <label>Foto de Perfil (URL)</label>
+        <input type="text" id="p-img" placeholder="https://link-da-imagem.jpg">
         
-        <label>Nome</label>
+        <label>Nome do Perfil</label>
         <input type="text" id="p-name">
         
-        <label>Descrição</label>
+        <label>Bio / Descrição</label>
         <textarea id="p-desc" rows="2"></textarea>
-
-        <label>Frase de Urgência (Topo)</label>
-        <input type="text" id="p-urgency" placeholder="Ex: 🔥 Últimas vagas!">
 
         <label>WhatsApp (Ex: 5511999999999)</label>
         <input type="text" id="p-whatsapp">
 
-        <label>Cor Neon</label>
+        <label>Cor do Tema</label>
         <input type="color" id="p-color" value="#3b82f6" style="height:50px; cursor:pointer;">
 
         <div style="display:flex; justify-content:space-between; align-items:center; margin:20px 0 10px;">
-            <span style="font-weight:bold">Gestor de Links</span>
+            <span style="font-weight:bold">Links da Bio</span>
             <button class="btn" id="add-link" style="width:auto; padding:8px 15px; background:var(--primary); color:white; font-size:0.8rem;">+ Novo Link</button>
         </div>
         <div id="links-container"></div>
 
-        <button class="btn btn-primary" id="save-btn" style="margin-top:20px;">🚀 Publicar Bio</button>
+        <button class="btn btn-primary" id="save-btn" style="margin-top:20px;">🚀 Publicar Alterações</button>
     </div>
 </div>
 
@@ -94,15 +94,17 @@
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('editor-screen').classList.remove('hidden');
             
-            // CONSTRUÇÃO DO LINK CORRETO
-            const currentPath = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
-            const bioUrl = `${currentPath}index.html?u=${user.uid}`;
-            document.getElementById('final-link').innerText = bioUrl;
+            // LÓGICA DE GERAÇÃO DO LINK CORRETO
+            const currentURL = window.location.href;
+            const baseURL = currentURL.substring(0, currentURL.lastIndexOf('/') + 1);
+            const publicLink = `${baseURL}index.html?u=${user.uid}`;
             
-            // Função Copiar
+            document.getElementById('final-link').innerText = publicLink;
+            
+            // Botão de copiar
             document.getElementById('copy-link-btn').onclick = () => {
-                navigator.clipboard.writeText(bioUrl);
-                alert("Link copiado! Agora cole-o na Bio do seu Instagram.");
+                navigator.clipboard.writeText(publicLink);
+                alert("Link copiado com sucesso!");
             };
 
             loadData(user.uid);
@@ -117,16 +119,10 @@
         div.className = 'link-item';
         div.innerHTML = `
             <div style="display:flex; gap:8px; margin-bottom:8px;">
-                <select class="l-icon" style="flex:1">
-                    <option value="fab fa-instagram" ${icon.includes('instagram')?'selected':''}>Instagram</option>
-                    <option value="fab fa-whatsapp" ${icon.includes('whatsapp')?'selected':''}>WhatsApp</option>
-                    <option value="fab fa-tiktok" ${icon.includes('tiktok')?'selected':''}>TikTok</option>
-                    <option value="fas fa-link" ${icon.includes('link')?'selected':''}>Link</option>
-                </select>
                 <input type="text" class="l-label" placeholder="Título" value="${label}" style="flex:2; margin:0">
                 <button onclick="this.parentElement.parentElement.remove()" style="color:#ff4444; background:none; border:none; cursor:pointer;">X</button>
             </div>
-            <input type="text" class="l-url" placeholder="URL Destino" value="${url}" style="margin:0">
+            <input type="text" class="l-url" placeholder="URL (https://...)" value="${url}" style="margin:0">
         `;
         document.getElementById('links-container').appendChild(div);
     }
@@ -139,10 +135,9 @@
             document.getElementById('p-desc').value = d.desc || "";
             document.getElementById('p-img').value = d.img || "";
             document.getElementById('p-color').value = d.color || "#3b82f6";
-            document.getElementById('p-urgency').value = d.urgency || "";
             document.getElementById('p-whatsapp').value = d.whatsapp || "";
             document.getElementById('links-container').innerHTML = "";
-            (d.links || []).forEach(l => addLinkField(l.label, l.url, l.icon));
+            (d.links || []).forEach(l => addLinkField(l.label, l.url));
         } else { addLinkField(); }
     }
 
@@ -151,18 +146,17 @@
         const links = Array.from(document.querySelectorAll('.link-item')).map(it => ({
             label: it.querySelector('.l-label').value,
             url: it.querySelector('.l-url').value,
-            icon: it.querySelector('.l-icon').value
+            icon: "fas fa-link"
         }));
         await setDoc(doc(db, "users", user.uid), {
             name: document.getElementById('p-name').value,
             desc: document.getElementById('p-desc').value,
             img: document.getElementById('p-img').value,
             color: document.getElementById('p-color').value,
-            urgency: document.getElementById('p-urgency').value,
             whatsapp: document.getElementById('p-whatsapp').value,
             links: links
         });
-        alert("✅ Bio atualizada com sucesso!");
+        alert("✅ Alterações publicadas!");
     };
 
     document.getElementById('btn-auth').onclick = async () => {
