@@ -37,7 +37,7 @@
         </div>
 
         <div class="url-display">
-            <p style="font-size: 0.7rem; color: #94a3b8; margin-bottom: 5px;">LINK PARA SUA BIO:</p>
+            <p style="font-size: 0.7rem; color: #94a3b8; margin-bottom: 5px;">COPIE ESTE LINK PARA O INSTAGRAM:</p>
             <strong id="final-link">Gerando...</strong>
         </div>
 
@@ -50,17 +50,17 @@
         <label>Bio (Descrição)</label>
         <textarea id="p-desc" rows="2"></textarea>
 
-        <label>Texto de Urgência (Topo da página)</label>
-        <input type="text" id="p-urgency" placeholder="Ex: 🔥 Últimas vagas com desconto!">
+        <label>Barra de Urgência (Topo)</label>
+        <input type="text" id="p-urgency" placeholder="Ex: 🔥 Últimas vagas com 50% OFF!">
 
         <label>WhatsApp Flutuante (Apenas números com DDD)</label>
         <input type="text" id="p-whatsapp" placeholder="Ex: 5511999999999">
 
-        <label>Cor do Brilho Neon</label>
+        <label>Cor do Brilho Neon (Aura)</label>
         <input type="color" id="p-color" value="#3b82f6" style="height:45px; cursor:pointer;">
 
         <div style="display:flex; justify-content:space-between; align-items:center; margin:15px 0;">
-            <span>Links da Bio</span>
+            <span>Links Sociais</span>
             <button class="btn" id="add-link" style="width:auto; padding:5px 15px; background:#1f2937; color:white;">+ Novo</button>
         </div>
         <div id="links-container"></div>
@@ -91,7 +91,8 @@
         if (user) {
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('editor-screen').classList.remove('hidden');
-            document.getElementById('final-link').innerText = `https://dapfyconnect-pixel.github.io/BioPro/?u=${user.uid}`;
+            // ATENÇÃO: Verifique se o caminho no GitHub Pages está correto (BioPro ou raiz)
+            document.getElementById('final-link').innerText = `${window.location.origin}${window.location.pathname.replace('admin.html', 'index.html')}?u=${user.uid}`;
             loadData(user.uid);
         } else {
             document.getElementById('auth-screen').classList.remove('hidden');
@@ -109,12 +110,12 @@
                     <option value="fab fa-whatsapp" ${icon.includes('whatsapp')?'selected':''}>WhatsApp</option>
                     <option value="fab fa-tiktok" ${icon.includes('tiktok')?'selected':''}>TikTok</option>
                     <option value="fab fa-youtube" ${icon.includes('youtube')?'selected':''}>YouTube</option>
-                    <option value="fas fa-link" ${icon.includes('link')?'selected':''}>Link</option>
+                    <option value="fas fa-link" ${icon.includes('link')?'selected':''}>Outro Link</option>
                 </select>
                 <input type="text" class="l-label" placeholder="Título" value="${label}" style="flex:2; margin:0">
                 <button onclick="this.parentElement.parentElement.remove()" style="color:red; background:none; border:none; font-weight:bold;">X</button>
             </div>
-            <input type="text" class="l-url" placeholder="URL" value="${url}" style="margin:0">
+            <input type="text" class="l-url" placeholder="URL (https://...)" value="${url}" style="margin:0">
         `;
         document.getElementById('links-container').appendChild(div);
     }
@@ -137,23 +138,25 @@
     document.getElementById('save-btn').onclick = async () => {
         const user = auth.currentUser;
         const btn = document.getElementById('save-btn');
-        btn.innerText = "Salvando...";
+        btn.innerText = "⏳ Publicando...";
         const links = Array.from(document.querySelectorAll('.link-item')).map(it => ({
             label: it.querySelector('.l-label').value,
             url: it.querySelector('.l-url').value,
             icon: it.querySelector('.l-icon').value
         }));
-        await setDoc(doc(db, "users", user.uid), {
-            name: document.getElementById('p-name').value,
-            desc: document.getElementById('p-desc').value,
-            img: document.getElementById('p-img').value,
-            color: document.getElementById('p-color').value,
-            urgency: document.getElementById('p-urgency').value,
-            whatsapp: document.getElementById('p-whatsapp').value,
-            links: links
-        });
-        alert("✅ Bio atualizada com sucesso!");
-        location.reload();
+        try {
+            await setDoc(doc(db, "users", user.uid), {
+                name: document.getElementById('p-name').value,
+                desc: document.getElementById('p-desc').value,
+                img: document.getElementById('p-img').value,
+                color: document.getElementById('p-color').value,
+                urgency: document.getElementById('p-urgency').value,
+                whatsapp: document.getElementById('p-whatsapp').value,
+                links: links
+            });
+            alert("✅ Bio atualizada com sucesso!");
+            location.reload();
+        } catch(e) { alert("Erro ao salvar: " + e.message); }
     };
 
     document.getElementById('btn-auth').onclick = async () => {
