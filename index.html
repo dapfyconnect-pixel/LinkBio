@@ -9,59 +9,61 @@
         :root { --bg: #030712; --card: #111827; --border: #1f2937; --primary: #3b82f6; --text: #f9fafb; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); color: var(--text); padding: 20px; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 450px; }
-        .box { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 20px; }
+        .container { width: 100%; max-width: 500px; }
+        .box { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 25px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
         .hidden { display: none; }
-        input, select, textarea { width: 100%; background: #030712; border: 1px solid var(--border); border-radius: 8px; padding: 12px; color: white; margin-bottom: 12px; outline: none; }
-        label { font-size: 0.8rem; color: #94a3b8; margin-bottom: 4px; display: block; }
-        .btn { width: 100%; padding: 14px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        input, select, textarea { width: 100%; background: #030712; border: 1px solid var(--border); border-radius: 10px; padding: 12px; color: white; margin-bottom: 15px; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(59, 130, 246, 0.2); }
+        label { font-size: 0.75rem; color: #94a3b8; margin-bottom: 5px; display: block; font-weight: 600; text-transform: uppercase; }
+        .btn { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 1rem; }
         .btn-primary { background: var(--primary); color: white; }
-        .url-display { background: rgba(59, 130, 246, 0.1); padding: 15px; border-radius: 10px; color: #60a5fa; font-size: 0.8rem; border: 1px dashed var(--primary); text-align: center; margin-bottom: 20px; word-break: break-all; }
-        .link-item { background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 10px; }
+        .btn-primary:hover { background: #2563eb; transform: translateY(-2px); }
+        .url-display { background: rgba(59, 130, 246, 0.05); padding: 15px; border-radius: 12px; color: #60a5fa; font-size: 0.85rem; border: 1px dashed var(--primary); text-align: center; margin-bottom: 25px; word-break: break-all; }
+        .link-item { background: rgba(255,255,255,0.03); padding: 15px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 12px; position: relative; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div id="auth-screen" class="box">
-        <h2>Acesse sua Bio Pro</h2>
-        <input type="email" id="email" placeholder="E-mail">
-        <input type="password" id="pass" placeholder="Senha">
-        <button class="btn btn-primary" id="btn-auth">Entrar / Cadastrar</button>
+        <h2 style="margin-bottom: 20px;">Acesse sua Bio Pro</h2>
+        <input type="email" id="email" placeholder="Seu e-mail">
+        <input type="password" id="pass" placeholder="Sua senha">
+        <button class="btn btn-primary" id="btn-auth">Entrar no Sistema</button>
     </div>
 
     <div id="editor-screen" class="box hidden">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h3>PowerCare Editor</h3>
-            <button id="btn-logout" style="color:#ff4444; background:none; border:none; cursor:pointer;">Sair</button>
+            <h3 style="color: var(--primary)">Editor PowerCare</h3>
+            <button id="btn-logout" style="color:#ff4444; background:none; border:none; cursor:pointer; font-weight:600;">Sair</button>
         </div>
 
         <div class="url-display">
-            <p style="font-size: 0.7rem; color: #94a3b8; margin-bottom: 5px;">LINK DA SUA BIO:</p>
-            <strong id="final-link">A carregar...</strong>
+            <p style="font-size: 0.65rem; color: #94a3b8; margin-bottom: 5px;">LINK PÚBLICO DA SUA BIO:</p>
+            <strong id="final-link">Carregando...</strong>
         </div>
 
-        <label>Foto do Perfil (URL)</label>
-        <input type="text" id="p-img" placeholder="Link da imagem">
+        <label>URL da Foto (Avatar)</label>
+        <input type="text" id="p-img" placeholder="https://link-da-imagem.jpg">
         
-        <label>Nome</label>
-        <input type="text" id="p-name">
+        <label>Nome do Perfil</label>
+        <input type="text" id="p-name" placeholder="Ex: João Silva">
         
-        <label>Bio (Descrição)</label>
-        <textarea id="p-desc" rows="2"></textarea>
+        <label>Descrição Curta</label>
+        <textarea id="p-desc" rows="2" placeholder="Ex: Especialista em Marketing Digital"></textarea>
 
-        <label>Barra de Urgência (Topo)</label>
-        <input type="text" id="p-urgency" placeholder="Ex: 🔥 Promoção termina hoje!">
+        <label>Texto de Urgência (Topo)</label>
+        <input type="text" id="p-urgency" placeholder="Ex: 🔥 Últimas 3 vagas disponíveis!">
 
-        <label>WhatsApp Flutuante (Ex: 5511999999999)</label>
-        <input type="text" id="p-whatsapp" placeholder="Apenas números com DDD">
+        <label>WhatsApp (Ex: 5511999999999)</label>
+        <input type="text" id="p-whatsapp" placeholder="Somente números">
 
-        <label>Cor do Brilho (Aura)</label>
-        <input type="color" id="p-color" value="#3b82f6" style="height:45px; cursor:pointer;">
+        <label>Cor de Destaque (Neon)</label>
+        <input type="color" id="p-color" value="#3b82f6" style="height:50px; cursor:pointer; padding: 5px;">
 
-        <div style="display:flex; justify-content:space-between; align-items:center; margin:15px 0;">
-            <span>Links</span>
-            <button class="btn" id="add-link" style="width:auto; padding:5px 15px; background:#1f2937; color:white;">+ Novo</button>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin:20px 0 10px;">
+            <span style="font-weight:bold">Botões de Links</span>
+            <button class="btn" id="add-link" style="width:auto; padding:8px 15px; background:var(--primary); color:white; font-size:0.8rem;">+ Adicionar</button>
         </div>
         <div id="links-container"></div>
 
@@ -91,7 +93,9 @@
         if (user) {
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('editor-screen').classList.remove('hidden');
-            document.getElementById('final-link').innerText = `${window.location.origin}${window.location.pathname.replace('admin.html', 'index.html')}?u=${user.uid}`;
+            // Geração automática do link correto baseado na URL atual
+            const bioUrl = window.location.href.replace('admin.html', 'index.html') + `?u=${user.uid}`;
+            document.getElementById('final-link').innerText = bioUrl;
             loadData(user.uid);
         } else {
             document.getElementById('auth-screen').classList.remove('hidden');
@@ -103,17 +107,18 @@
         const div = document.createElement('div');
         div.className = 'link-item';
         div.innerHTML = `
-            <div style="display:flex; gap:5px; margin-bottom:5px;">
+            <div style="display:flex; gap:8px; margin-bottom:8px;">
                 <select class="l-icon" style="flex:1">
                     <option value="fab fa-instagram" ${icon.includes('instagram')?'selected':''}>Instagram</option>
                     <option value="fab fa-whatsapp" ${icon.includes('whatsapp')?'selected':''}>WhatsApp</option>
                     <option value="fab fa-tiktok" ${icon.includes('tiktok')?'selected':''}>TikTok</option>
-                    <option value="fas fa-link" ${icon.includes('link')?'selected':''}>Link</option>
+                    <option value="fab fa-youtube" ${icon.includes('youtube')?'selected':''}>YouTube</option>
+                    <option value="fas fa-link" ${icon.includes('link')?'selected':''}>Outro Link</option>
                 </select>
                 <input type="text" class="l-label" placeholder="Título" value="${label}" style="flex:2; margin:0">
-                <button onclick="this.parentElement.parentElement.remove()" style="color:red; background:none; border:none;">X</button>
+                <button onclick="this.parentElement.parentElement.remove()" style="color:#ff4444; background:none; border:none; font-weight:bold; cursor:pointer; padding:0 5px;">X</button>
             </div>
-            <input type="text" class="l-url" placeholder="URL" value="${url}" style="margin:0">
+            <input type="text" class="l-url" placeholder="https://URL-DESTINO.com" value="${url}" style="margin:0">
         `;
         document.getElementById('links-container').appendChild(div);
     }
@@ -149,7 +154,7 @@
             whatsapp: document.getElementById('p-whatsapp').value,
             links: links
         });
-        alert("✅ Publicado!");
+        alert("✅ Bio publicada com sucesso!");
         location.reload();
     };
 
