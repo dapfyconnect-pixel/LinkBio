@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Bio | Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #030712; --card: #111827; --border: #1f2937; --primary: #3b82f6; --text: #f9fafb; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg); color: var(--text); padding: 20px; display: flex; justify-content: center; min-height: 100vh; }
+        .container { width: 100%; max-width: 500px; }
+        .box { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 25px; margin-bottom: 20px; }
+        .hidden { display: none; }
+        
+        input, select, textarea { width: 100%; background: #030712; border: 1px solid var(--border); border-radius: 8px; padding: 12px; color: white; margin-bottom: 15px; outline: none; }
+        input:focus { border-color: var(--primary); }
+        .btn { width: 100%; padding: 14px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-add { background: none; border: 1px solid var(--primary); color: var(--primary); width: auto; padding: 8px 15px; font-size: 0.8rem; margin-bottom: 15px; }
+        
+        /* Gráfico */
+        .chart-container { display: flex; align-items: flex-end; gap: 8px; height: 60px; margin-top: 10px; background: #0f172a; padding: 10px; border-radius: 8px; }
+        .chart-bar { flex: 1; background: var(--primary); border-radius: 3px 3px 0 0; min-height: 2px; position: relative; }
+        
+        .link-item { background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 10px; }
+        .link-row { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; }
+        .badge { background: #1f2937; color: var(--primary); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div id="auth-screen" class="box">
+            <h2 style="margin-bottom: 10px;">Acesse sua Bio</h2>
+            <input type="email" id="email" placeholder="E-mail">
+            <input type="password" id="pass" placeholder="Senha">
+            <button class="btn btn-primary" id="btn-auth">Entrar / Cadastrar</button>
+        </div>
+
+        <div id="editor-screen" class="box hidden">
+            <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3>Dashboard</h3>
+                <button id="btn-logout" style="background:none; border:none; color:#ff4444; cursor:pointer">Sair</button>
+            </header>
+
+            <div style="background: #1e293b; padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid var(--primary);">
+                <label style="font-size: 0.65rem; color: #94a3b8; font-weight: bold;">SEU LINK PÚBLICO:</label>
+                <div id="user-url" style="color: #60a5fa; font-weight: bold; font-size: 0.8rem; margin-top: 5px; word-break: break-all;"></div>
+            </div>
+
+            <label style="font-size: 0.7rem;">ESTATÍSTICAS DE CLIQUES</label>
+            <div id="chart" class="chart-container"></div>
+            <div id="total-info" style="font-size: 0.7rem; text-align: right; margin-top: 5px; color: #666;">Total: 0</div>
+
+            <hr style="border: 0; border-top: 1px solid #1f2937; margin: 20px 0;">
+
+            <label>Foto do Perfil (URL)</label>
+            <input type="text" id="p-img" placeholder="https://...">
+
+            <label>Nome</label>
+            <input type="text" id="p-name">
+
+            <label>Bio</label>
+            <textarea id="p-desc" rows="2"></textarea>
+
+            <label>Cor do Brilho</label>
+            <input type="color" id="p-color" value="#3b82f6" style="height: 45px; padding: 5px;">
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                <label>Links</label>
+                <button class="btn btn-add" id="add-link">+ Novo Link</button>
+            </div>
+            <div id="links-container"></div>
+
+            <button class="btn btn-primary" id="save-btn" style="margin-top: 10px;"><i class="fas fa-save"></i> Publicar Alterações</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAAvdX5mNJI09c43ZR3QlyKrk6S22DeQ90",
+            authDomain: "biolink-211d7.firebaseapp.com",
+            projectId: "biolink-211d7",
+            storageBucket: "biolink-211d7.firebasestorage.app",
+            messagingSenderId: "607886026514",
+            appId: "1:607886026514:web:2e803fe882e6d39105b5cb"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const iconList = ['fab fa-instagram', 'fab fa-whatsapp', 'fab fa-github', 'fab fa-youtube', 'fas fa-link'];
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('editor-screen').classList.remove('hidden');
+                // IMPORTANTE: Gera o link correto com o UID para evitar "ID Inválido"
+                document.getElementById('user-url').innerText = window.location.origin + "/index.html?u=" + user.uid;
+                loadData(user.uid);
+            } else {
+                document.getElementById('auth-screen').classList.remove('hidden');
+                document.getElementById('editor-screen').classList.add('hidden');
+            }
+        });
+
+        window.addLinkField = (label = "", url = "", icon = "fas fa-link", clicks = 0) => {
+            const div = document.createElement('div');
+            div.className = 'link-item';
+            div.innerHTML = `
+                <div class="link-row">
+                    <select class="l-icon" style="width: 70px; margin:0">
+                        ${iconList.map(i => `<option value="${i}" ${icon==i?'selected':''}>${i.split('-')[1]}</option>`).join('')}
+                    </select>
+                    <input type="text" class="l-label" placeholder="Título" value="${label}" style="margin:0; flex:1">
+                    <span class="badge">${clicks}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" style="color:#ef4444; background:none; border:none; cursor:pointer"><i class="fas fa-trash"></i></button>
+                </div>
+                <input type="text" class="l-url" placeholder="URL" value="${url}" style="margin:0">
+            `;
+            document.getElementById('links-container').appendChild(div);
+        }
+
+        async function loadData(uid) {
+            const snap = await getDoc(doc(db, "users", uid));
+            const container = document.getElementById('links-container');
+            container.innerHTML = "";
+            
+            if (snap.exists()) {
+                const d = snap.data();
+                document.getElementById('p-name').value = d.name || "";
+                document.getElementById('p-desc').value = d.desc || "";
+                document.getElementById('p-img').value = d.img || "";
+                document.getElementById('p-color').value = d.color || "#3b82f6";
+                
+                let totalClicks = 0;
+                let chartHtml = "";
+
+                for(let i=0; i < (d.links || []).length; i++) {
+                    const cSnap = await getDoc(doc(db, "analytics", `${uid}_link_${i}`));
+                    const clicks = cSnap.exists() ? cSnap.data().clicks : 0;
+                    totalClicks += clicks;
+                    addLinkField(d.links[i].label, d.links[i].url, d.links[i].icon, clicks);
+                    chartHtml += `<div class="chart-bar" style="height:${Math.min(clicks*5, 50)}px"></div>`;
+                }
+                document.getElementById('chart').innerHTML = chartHtml;
+                document.getElementById('total-info').innerText = "Total de cliques: " + totalClicks;
+            } else {
+                addLinkField(); 
+            }
+        }
+
+        document.getElementById('save-btn').onclick = async () => {
+            const user = auth.currentUser;
+            const links = Array.from(document.querySelectorAll('.link-item')).map(it => ({
+                label: it.querySelector('.l-label').value,
+                url: it.querySelector('.l-url').value,
+                icon: it.querySelector('.l-icon').value
+            }));
+
+            await setDoc(doc(db, "users", user.uid), {
+                name: document.getElementById('p-name').value,
+                desc: document.getElementById('p-desc').value,
+                img: document.getElementById('p-img').value,
+                color: document.getElementById('p-color').value,
+                links: links
+            });
+            alert("Publicado com sucesso!");
+            loadData(user.uid);
+        };
+
+        document.getElementById('btn-auth').onclick = async () => {
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('pass').value;
+            try { await signInWithEmailAndPassword(auth, email, pass); }
+            catch { try { await createUserWithEmailAndPassword(auth, email, pass); } catch(e) { alert(e.message); } }
+        };
+
+        document.getElementById('btn-logout').onclick = () => signOut(auth);
+        document.getElementById('add-link').onclick = () => addLinkField();
+    </script>
+</body>
+</html>
