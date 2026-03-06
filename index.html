@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Bio | Redes Sociais</title>
+    <title>Admin Bio | PowerCare</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --bg: #030712; --card: #111827; --border: #1f2937; --primary: #3b82f6; --text: #f9fafb; }
@@ -15,48 +15,57 @@
         input, select, textarea { width: 100%; background: #030712; border: 1px solid var(--border); border-radius: 8px; padding: 12px; color: white; margin-bottom: 10px; outline: none; }
         .btn { width: 100%; padding: 14px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .btn-primary { background: var(--primary); color: white; }
-        .link-item { background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 10px; }
-        .link-row { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; }
-        .url-display { background: rgba(59, 130, 246, 0.1); padding: 10px; border-radius: 8px; color: #60a5fa; font-size: 0.8rem; word-break: break-all; margin-bottom: 20px; border: 1px dashed var(--primary); text-align: center; }
+        .link-item { background: rgba(255,255,255,0.02); padding: 12px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div id="auth-screen" class="box">
-        <h2>Acesse sua Bio</h2>
+        <h2>Painel PowerCare</h2>
         <input type="email" id="email" placeholder="E-mail">
         <input type="password" id="pass" placeholder="Senha">
-        <button class="btn btn-primary" id="btn-auth">Entrar / Cadastrar</button>
+        <button class="btn btn-primary" id="btn-auth">Entrar</button>
     </div>
 
     <div id="editor-screen" class="box hidden">
-        <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
-            <h3>Painel de Controle</h3>
-            <button id="btn-logout" style="color:#ff4444; background:none; border:none; cursor:pointer;">Sair</button>
-        </div>
+        <header style="display:flex; justify-content:space-between; margin-bottom:15px;">
+            <h3>Editor Premium</h3>
+            <button id="btn-logout" style="color:#ff4444; background:none; border:none;">Sair</button>
+        </header>
 
-        <div class="url-display" id="url-container">
-            <p style="font-size: 0.7rem; color: #94a3b8; margin-bottom: 5px;">LINK PARA COLAR NA BIO:</p>
-            <strong id="final-link">Gerando...</strong>
-        </div>
+        <label>Foto do Perfil (URL)</label>
+        <input type="text" id="p-img">
+        
+        <label>Nome e Bio</label>
+        <input type="text" id="p-name" placeholder="Nome">
+        <textarea id="p-desc" rows="2" placeholder="Bio"></textarea>
 
-        <label>Foto (URL)</label>
-        <input type="text" id="p-img" placeholder="https://...">
-        <label>Nome</label>
-        <input type="text" id="p-name">
-        <label>Bio</label>
-        <textarea id="p-desc" rows="2"></textarea>
-        <label>Cor do Brilho</label>
+        <label>Tema de Fundo Animado (PowerCare)</label>
+        <select id="p-theme">
+            <option value="none">Estático (Apenas cor)</option>
+            <option value="stars">✨ Estrelas Cadentes</option>
+            <option value="waves">🌊 Ondas Suaves</option>
+            <option value="gradient">🌈 Gradiente Animado</option>
+            <option value="matrix">📟 Matrix Code</option>
+            <option value="bubbles">🧼 Bolhas Flutuantes</option>
+            <option value="fire">🔥 Brasa Viva</option>
+            <option value="snow">❄️ Neve caindo</option>
+            <option value="aurora">🌌 Aurora Boreal</option>
+            <option value="digital">💻 Rede Digital</option>
+            <option value="particles">⚛️ Partículas Atômicas</option>
+        </select>
+
+        <label>Cor de Destaque</label>
         <input type="color" id="p-color" value="#3b82f6" style="height:45px;">
 
         <div style="display:flex; justify-content:space-between; align-items:center; margin:15px 0;">
-            <span>Links Sociais</span>
-            <button class="btn" id="add-link" style="width:auto; padding:5px 15px; background:#1f2937; color:white;">+ Novo Link</button>
+            <span>Links</span>
+            <button class="btn" id="add-link" style="width:auto; padding:5px 15px; background:#1f2937; color:white;">+ Adicionar</button>
         </div>
         <div id="links-container"></div>
 
-        <button class="btn btn-primary" id="save-btn" style="margin-top:20px;">🚀 Publicar Alterações</button>
+        <button class="btn btn-primary" id="save-btn">Publicar Alterações</button>
     </div>
 </div>
 
@@ -82,7 +91,6 @@
         if (user) {
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('editor-screen').classList.remove('hidden');
-            document.getElementById('final-link').innerText = `https://dapfyconnect-pixel.github.io/BioPro/?u=${user.uid}`;
             loadData(user.uid);
         } else {
             document.getElementById('auth-screen').classList.remove('hidden');
@@ -94,20 +102,17 @@
         const div = document.createElement('div');
         div.className = 'link-item';
         div.innerHTML = `
-            <div class="link-row">
-                <select class="l-icon" style="width:100px; margin:0">
+            <div style="display:flex; gap:5px; margin-bottom:5px;">
+                <select class="l-icon" style="flex:1">
                     <option value="fab fa-instagram" ${icon.includes('instagram')?'selected':''}>Instagram</option>
                     <option value="fab fa-whatsapp" ${icon.includes('whatsapp')?'selected':''}>WhatsApp</option>
                     <option value="fab fa-tiktok" ${icon.includes('tiktok')?'selected':''}>TikTok</option>
-                    <option value="fab fa-youtube" ${icon.includes('youtube')?'selected':''}>YouTube</option>
-                    <option value="fab fa-facebook" ${icon.includes('facebook')?'selected':''}>Facebook</option>
-                    <option value="fab fa-linkedin" ${icon.includes('linkedin')?'selected':''}>LinkedIn</option>
-                    <option value="fas fa-link" ${icon.includes('link')?'selected':''}>Outro</option>
+                    <option value="fas fa-link" ${icon.includes('link')?'selected':''}>Link</option>
                 </select>
-                <input type="text" class="l-label" placeholder="Título" value="${label}" style="margin:0; flex:1">
-                <button onclick="this.parentElement.parentElement.remove()" style="color:#ef4444; background:none; border:none; cursor:pointer;">X</button>
+                <input type="text" class="l-label" placeholder="Título" value="${label}" style="flex:2; margin:0">
+                <button onclick="this.parentElement.parentElement.remove()" style="background:none; border:none; color:red;">X</button>
             </div>
-            <input type="text" class="l-url" placeholder="URL (https://...)" value="${url}" style="margin:0">
+            <input type="text" class="l-url" placeholder="https://..." value="${url}" style="margin:0">
         `;
         document.getElementById('links-container').appendChild(div);
     }
@@ -120,6 +125,7 @@
             document.getElementById('p-desc').value = d.desc || "";
             document.getElementById('p-img').value = d.img || "";
             document.getElementById('p-color').value = d.color || "#3b82f6";
+            document.getElementById('p-theme').value = d.theme || "none";
             document.getElementById('links-container').innerHTML = "";
             (d.links || []).forEach(l => addLinkField(l.label, l.url, l.icon));
         } else { addLinkField(); }
@@ -128,7 +134,7 @@
     document.getElementById('save-btn').onclick = async () => {
         const user = auth.currentUser;
         const btn = document.getElementById('save-btn');
-        btn.innerText = "⏳ Publicando...";
+        btn.innerText = "Salvando...";
         
         const links = Array.from(document.querySelectorAll('.link-item')).map(it => ({
             label: it.querySelector('.l-label').value,
@@ -136,17 +142,16 @@
             icon: it.querySelector('.l-icon').value
         }));
 
-        try {
-            await setDoc(doc(db, "users", user.uid), {
-                name: document.getElementById('p-name').value,
-                desc: document.getElementById('p-desc').value,
-                img: document.getElementById('p-img').value,
-                color: document.getElementById('p-color').value,
-                links: links
-            });
-            alert("✅ Bio atualizada!");
-            location.reload();
-        } catch (e) { alert("Erro: " + e.message); }
+        await setDoc(doc(db, "users", user.uid), {
+            name: document.getElementById('p-name').value,
+            desc: document.getElementById('p-desc').value,
+            img: document.getElementById('p-img').value,
+            color: document.getElementById('p-color').value,
+            theme: document.getElementById('p-theme').value,
+            links: links
+        });
+        alert("Publicado!");
+        location.reload();
     };
 
     document.getElementById('btn-auth').onclick = async () => {
