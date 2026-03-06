@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Bio | PowerCare</title>
+    <title>Admin Bio | PowerCare Premium</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --bg: #030712; --card: #111827; --border: #1f2937; --primary: #3b82f6; --text: #f9fafb; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); color: var(--text); padding: 20px; display: flex; justify-content: center; }
         .container { width: 100%; max-width: 450px; }
         .box { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 20px; }
@@ -15,57 +15,58 @@
         input, select, textarea { width: 100%; background: #030712; border: 1px solid var(--border); border-radius: 8px; padding: 12px; color: white; margin-bottom: 10px; outline: none; }
         .btn { width: 100%; padding: 14px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .btn-primary { background: var(--primary); color: white; }
-        .link-item { background: rgba(255,255,255,0.02); padding: 12px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 10px; }
+        .url-display { background: rgba(59, 130, 246, 0.1); padding: 15px; border-radius: 10px; color: #60a5fa; font-size: 0.8rem; border: 1px dashed var(--primary); text-align: center; margin-bottom: 20px; }
+        .link-item { background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div id="auth-screen" class="box">
-        <h2>Painel PowerCare</h2>
+        <h2>Acesse sua Bio</h2>
         <input type="email" id="email" placeholder="E-mail">
         <input type="password" id="pass" placeholder="Senha">
-        <button class="btn btn-primary" id="btn-auth">Entrar</button>
+        <button class="btn btn-primary" id="btn-auth">Entrar / Cadastrar</button>
     </div>
 
     <div id="editor-screen" class="box hidden">
-        <header style="display:flex; justify-content:space-between; margin-bottom:15px;">
-            <h3>Editor Premium</h3>
-            <button id="btn-logout" style="color:#ff4444; background:none; border:none;">Sair</button>
-        </header>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h3>PowerCare Admin</h3>
+            <button id="btn-logout" style="color:#ff4444; background:none; border:none; cursor:pointer;">Sair</button>
+        </div>
+
+        <div class="url-display">
+            <p style="font-size: 0.7rem; color: #94a3b8; margin-bottom: 5px;">LINK PARA SUA BIO (COPIAR):</p>
+            <strong id="final-link">Gerando link...</strong>
+        </div>
 
         <label>Foto do Perfil (URL)</label>
-        <input type="text" id="p-img">
+        <input type="text" id="p-img" placeholder="https://...">
         
         <label>Nome e Bio</label>
-        <input type="text" id="p-name" placeholder="Nome">
-        <textarea id="p-desc" rows="2" placeholder="Bio"></textarea>
+        <input type="text" id="p-name" placeholder="Seu Nome">
+        <textarea id="p-desc" rows="2" placeholder="Sua descrição curta"></textarea>
 
-        <label>Tema de Fundo Animado (PowerCare)</label>
+        <label>Tema Animado (PowerCare)</label>
         <select id="p-theme">
-            <option value="none">Estático (Apenas cor)</option>
-            <option value="stars">✨ Estrelas Cadentes</option>
-            <option value="waves">🌊 Ondas Suaves</option>
-            <option value="gradient">🌈 Gradiente Animado</option>
-            <option value="matrix">📟 Matrix Code</option>
-            <option value="bubbles">🧼 Bolhas Flutuantes</option>
-            <option value="fire">🔥 Brasa Viva</option>
-            <option value="snow">❄️ Neve caindo</option>
-            <option value="aurora">🌌 Aurora Boreal</option>
-            <option value="digital">💻 Rede Digital</option>
-            <option value="particles">⚛️ Partículas Atômicas</option>
+            <option value="none">Estático (Apenas Brilho)</option>
+            <option value="stars">✨ Estrelas</option>
+            <option value="waves">🌊 Ondas</option>
+            <option value="matrix">📟 Matrix</option>
+            <option value="bubbles">🧼 Bolhas</option>
+            <option value="fire">🔥 Brasa</option>
         </select>
 
-        <label>Cor de Destaque</label>
+        <label>Cor do Neon</label>
         <input type="color" id="p-color" value="#3b82f6" style="height:45px;">
 
         <div style="display:flex; justify-content:space-between; align-items:center; margin:15px 0;">
-            <span>Links</span>
-            <button class="btn" id="add-link" style="width:auto; padding:5px 15px; background:#1f2937; color:white;">+ Adicionar</button>
+            <span>Redes Sociais</span>
+            <button class="btn" id="add-link" style="width:auto; padding:5px 15px; background:#1f2937; color:white;">+ Novo</button>
         </div>
         <div id="links-container"></div>
 
-        <button class="btn btn-primary" id="save-btn">Publicar Alterações</button>
+        <button class="btn btn-primary" id="save-btn" style="margin-top:20px;">🚀 Publicar Alterações</button>
     </div>
 </div>
 
@@ -91,6 +92,7 @@
         if (user) {
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('editor-screen').classList.remove('hidden');
+            document.getElementById('final-link').innerText = `https://dapfyconnect-pixel.github.io/BioPro/?u=${user.uid}`;
             loadData(user.uid);
         } else {
             document.getElementById('auth-screen').classList.remove('hidden');
@@ -107,12 +109,13 @@
                     <option value="fab fa-instagram" ${icon.includes('instagram')?'selected':''}>Instagram</option>
                     <option value="fab fa-whatsapp" ${icon.includes('whatsapp')?'selected':''}>WhatsApp</option>
                     <option value="fab fa-tiktok" ${icon.includes('tiktok')?'selected':''}>TikTok</option>
-                    <option value="fas fa-link" ${icon.includes('link')?'selected':''}>Link</option>
+                    <option value="fab fa-youtube" ${icon.includes('youtube')?'selected':''}>YouTube</option>
+                    <option value="fas fa-link" ${icon.includes('link')?'selected':''}>Outro</option>
                 </select>
                 <input type="text" class="l-label" placeholder="Título" value="${label}" style="flex:2; margin:0">
-                <button onclick="this.parentElement.parentElement.remove()" style="background:none; border:none; color:red;">X</button>
+                <button onclick="this.parentElement.parentElement.remove()" style="color:red; background:none; border:none;">X</button>
             </div>
-            <input type="text" class="l-url" placeholder="https://..." value="${url}" style="margin:0">
+            <input type="text" class="l-url" placeholder="URL (https://...)" value="${url}" style="margin:0">
         `;
         document.getElementById('links-container').appendChild(div);
     }
@@ -134,14 +137,12 @@
     document.getElementById('save-btn').onclick = async () => {
         const user = auth.currentUser;
         const btn = document.getElementById('save-btn');
-        btn.innerText = "Salvando...";
-        
+        btn.innerText = "⏳ Salvando...";
         const links = Array.from(document.querySelectorAll('.link-item')).map(it => ({
             label: it.querySelector('.l-label').value,
             url: it.querySelector('.l-url').value,
             icon: it.querySelector('.l-icon').value
         }));
-
         await setDoc(doc(db, "users", user.uid), {
             name: document.getElementById('p-name').value,
             desc: document.getElementById('p-desc').value,
@@ -150,7 +151,7 @@
             theme: document.getElementById('p-theme').value,
             links: links
         });
-        alert("Publicado!");
+        alert("✅ Bio Publicada!");
         location.reload();
     };
 
@@ -160,7 +161,6 @@
         try { await signInWithEmailAndPassword(auth, email, pass); }
         catch { try { await createUserWithEmailAndPassword(auth, email, pass); } catch(e) { alert(e.message); } }
     };
-
     document.getElementById('btn-logout').onclick = () => signOut(auth);
     document.getElementById('add-link').onclick = () => addLinkField();
 </script>
