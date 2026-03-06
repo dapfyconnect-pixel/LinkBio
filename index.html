@@ -15,185 +15,146 @@
         input, select, textarea { width: 100%; background: #030712; border: 1px solid var(--border); border-radius: 8px; padding: 12px; color: white; margin-bottom: 10px; outline: none; }
         .btn { width: 100%; padding: 14px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .btn-primary { background: var(--primary); color: white; }
-        
-        /* Estilo do Link para Copiar */
-        .copy-link-box { 
-            background: rgba(59, 130, 246, 0.1); 
-            border: 1px dashed var(--primary); 
-            padding: 15px; 
-            border-radius: 10px; 
-            margin-bottom: 25px; 
-            text-align: center;
-        }
-        .url-text { 
-            display: block; 
-            background: #000; 
-            padding: 10px; 
-            border-radius: 5px; 
-            color: #60a5fa; 
-            font-size: 0.8rem; 
-            margin-top: 10px; 
-            word-break: break-all;
-            user-select: all;
-        }
-
+        .copy-box { background: rgba(59, 130, 246, 0.1); border: 1px dashed var(--primary); padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: center; }
         .link-item { background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 10px; }
         .link-row { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; }
         .badge { background: #1f2937; color: var(--primary); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; }
     </style>
 </head>
 <body>
-
-<div class="container">
-    <div id="auth-screen" class="box">
-        <h2>Acesse sua Bio</h2>
-        <input type="email" id="email" placeholder="E-mail">
-        <input type="password" id="pass" placeholder="Senha">
-        <button class="btn btn-primary" id="btn-auth">Entrar / Cadastrar</button>
-    </div>
-
-    <div id="editor-screen" class="box hidden">
-        <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
-            <h3>Painel de Edição</h3>
-            <button id="btn-logout" style="color:#ff4444; background:none; border:none; cursor:pointer;">Sair</button>
+    <div class="container">
+        <div id="auth-screen" class="box">
+            <h2>Acesse sua Bio</h2>
+            <input type="email" id="email" placeholder="E-mail">
+            <input type="password" id="pass" placeholder="Senha">
+            <button class="btn btn-primary" id="btn-auth">Entrar / Cadastrar</button>
         </div>
 
-        <div class="copy-link-box">
-            <p style="font-size:0.75rem; color:#94a3b8; font-weight:bold;">🔗 COPIE ESTE LINK PARA SUA BIO:</p>
-            <code class="url-text" id="final-link">Gerando link...</code>
-            <p style="font-size:0.6rem; color:#666; margin-top:5px;">Toque no link acima para selecionar tudo</p>
-        </div>
-
-        <label>Foto do Perfil (URL)</label>
-        <input type="text" id="p-img" placeholder="https://...">
-        <label>Nome</label>
-        <input type="text" id="p-name" placeholder="Seu Nome">
-        <label>Bio (Pequena descrição)</label>
-        <textarea id="p-desc" rows="2" placeholder="Ex: Designer & Developer"></textarea>
-        <label>Cor Neon do Perfil</label>
-        <input type="color" id="p-color" value="#00d2ff" style="height:45px; cursor:pointer;">
-
-        <div style="display:flex; justify-content:space-between; align-items:center; margin:15px 0;">
-            <span>Meus Links</span>
-            <button class="btn" id="add-link" style="width:auto; padding:5px 15px; background:#1f2937; color:white;">+ Adicionar</button>
-        </div>
-        <div id="links-container"></div>
-
-        <button class="btn btn-primary" id="save-btn" style="margin-top:20px;">🚀 Publicar Alterações</button>
-    </div>
-</div>
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyAAvdX5mNJI09c43ZR3QlyKrk6S22DeQ90",
-        authDomain: "biolink-211d7.firebaseapp.com",
-        projectId: "biolink-211d7",
-        storageBucket: "biolink-211d7.firebasestorage.app",
-        messagingSenderId: "607886026514",
-        appId: "1:607886026514:web:2e803fe882e6d39105b5cb"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            document.getElementById('auth-screen').classList.add('hidden');
-            document.getElementById('editor-screen').classList.remove('hidden');
-            
-            // GERA O LINK PERSONALIZADO PARA O GITHUB
-            const linkOficial = `https://dapfyconnect-pixel.github.io/BioPro/?u=${user.uid}`;
-            document.getElementById('final-link').innerText = linkOficial;
-            
-            loadData(user.uid);
-        } else {
-            document.getElementById('auth-screen').classList.remove('hidden');
-            document.getElementById('editor-screen').classList.add('hidden');
-        }
-    });
-
-    window.addLinkField = (label = "", url = "", icon = "fas fa-link", clicks = 0) => {
-        const div = document.createElement('div');
-        div.className = 'link-item';
-        div.innerHTML = `
-            <div class="link-row">
-                <select class="l-icon" style="width:75px; margin:0">
-                    <option value="fab fa-instagram" ${icon.includes('instagram')?'selected':''}>Insta</option>
-                    <option value="fab fa-whatsapp" ${icon.includes('whatsapp')?'selected':''}>Zap</option>
-                    <option value="fab fa-github" ${icon.includes('github')?'selected':''}>Git</option>
-                    <option value="fab fa-youtube" ${icon.includes('youtube')?'selected':''}>YT</option>
-                    <option value="fas fa-link" ${icon.includes('link')?'selected':''}>Link</option>
-                </select>
-                <input type="text" class="l-label" placeholder="Título" value="${label}" style="margin:0; flex:1">
-                <span class="badge">${clicks}</span>
-                <button onclick="this.parentElement.parentElement.remove()" style="color:#ef4444; background:none; border:none; cursor:pointer; font-weight:bold; padding:0 5px;">X</button>
+        <div id="editor-screen" class="box hidden">
+            <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+                <h3>Dashboard</h3>
+                <button id="btn-logout" style="color:#ff4444; background:none; border:none; cursor:pointer;">Sair</button>
             </div>
-            <input type="text" class="l-url" placeholder="URL (https://...)" value="${url}" style="margin:0">
-        `;
-        document.getElementById('links-container').appendChild(div);
-    }
 
-    async function loadData(uid) {
-        const snap = await getDoc(doc(db, "users", uid));
-        if (snap.exists()) {
-            const d = snap.data();
-            document.getElementById('p-name').value = d.name || "";
-            document.getElementById('p-desc').value = d.desc || "";
-            document.getElementById('p-img').value = d.img || "";
-            document.getElementById('p-color').value = d.color || "#00d2ff";
-            document.getElementById('links-container').innerHTML = "";
-            for(let i=0; i < (d.links || []).length; i++) {
-                const cSnap = await getDoc(doc(db, "analytics", `${uid}_link_${i}`));
-                addLinkField(d.links[i].label, d.links[i].url, d.links[i].icon, cSnap.exists() ? cSnap.data().clicks : 0);
+            <div class="copy-box">
+                <p style="font-size:0.7rem; color:#94a3b8;">LINK PARA SUA BIO:</p>
+                <code id="final-link" style="color:#60a5fa; font-size:0.8rem; word-break:break-all; display:block; margin-top:5px;"></code>
+            </div>
+
+            <label>Foto do Perfil (URL)</label>
+            <input type="text" id="p-img" placeholder="https://...">
+            <label>Nome</label>
+            <input type="text" id="p-name">
+            <label>Bio</label>
+            <textarea id="p-desc" rows="2"></textarea>
+            <label>Cor do Brilho</label>
+            <input type="color" id="p-color" value="#3b82f6" style="height:45px;">
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin:15px 0;">
+                <span>Links</span>
+                <button class="btn" id="add-link" style="width:auto; padding:5px 15px; background:#1f2937; color:white;">+ Novo</button>
+            </div>
+            <div id="links-container"></div>
+            <button class="btn btn-primary" id="save-btn" style="margin-top:20px;">Publicar Alterações</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAAvdX5mNJI09c43ZR3QlyKrk6S22DeQ90",
+            authDomain: "biolink-211d7.firebaseapp.com",
+            projectId: "biolink-211d7",
+            storageBucket: "biolink-211d7.firebasestorage.app",
+            messagingSenderId: "607886026514",
+            appId: "1:607886026514:web:2e803fe882e6d39105b5cb"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('editor-screen').classList.remove('hidden');
+                document.getElementById('final-link').innerText = `https://dapfyconnect-pixel.github.io/BioPro/?u=${user.uid}`;
+                loadData(user.uid);
+            } else {
+                document.getElementById('auth-screen').classList.remove('hidden');
+                document.getElementById('editor-screen').classList.add('hidden');
             }
-        } else {
-            addLinkField(); 
+        });
+
+        window.addLinkField = (label = "", url = "", icon = "fas fa-link", clicks = 0) => {
+            const div = document.createElement('div');
+            div.className = 'link-item';
+            div.innerHTML = `
+                <div class="link-row">
+                    <select class="l-icon" style="width:70px; margin:0">
+                        <option value="fab fa-instagram" ${icon.includes('instagram')?'selected':''}>IG</option>
+                        <option value="fab fa-whatsapp" ${icon.includes('whatsapp')?'selected':''}>Zap</option>
+                        <option value="fas fa-link" ${icon.includes('link')?'selected':''}>Link</option>
+                    </select>
+                    <input type="text" class="l-label" value="${label}" style="margin:0; flex:1">
+                    <span class="badge">${clicks}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" style="color:red; background:none; border:none;">X</button>
+                </div>
+                <input type="text" class="l-url" value="${url}" style="margin:0">
+            `;
+            document.getElementById('links-container').appendChild(div);
         }
-    }
 
-    document.getElementById('save-btn').onclick = async () => {
-        const user = auth.currentUser;
-        const btn = document.getElementById('save-btn');
-        btn.innerText = "⏳ Publicando...";
-        btn.disabled = true;
-
-        const links = Array.from(document.querySelectorAll('.link-item')).map(it => ({
-            label: it.querySelector('.l-label').value,
-            url: it.querySelector('.l-url').value,
-            icon: it.querySelector('.l-icon').value
-        }));
-
-        try {
-            await setDoc(doc(db, "users", user.uid), {
-                name: document.getElementById('p-name').value,
-                desc: document.getElementById('p-desc').value,
-                img: document.getElementById('p-img').value,
-                color: document.getElementById('p-color').value,
-                links: links
-            });
-            alert("✅ Bio atualizada com sucesso!");
-            location.reload();
-        } catch (e) { 
-            alert("Erro ao salvar: " + e.message); 
-            btn.disabled = false;
-            btn.innerText = "🚀 Publicar Alterações";
+        async function loadData(uid) {
+            const snap = await getDoc(doc(db, "users", uid));
+            if (snap.exists()) {
+                const d = snap.data();
+                document.getElementById('p-name').value = d.name || "";
+                document.getElementById('p-desc').value = d.desc || "";
+                document.getElementById('p-img').value = d.img || "";
+                document.getElementById('p-color').value = d.color || "#3b82f6";
+                document.getElementById('links-container').innerHTML = "";
+                for(let i=0; i < (d.links || []).length; i++) {
+                    const cSnap = await getDoc(doc(db, "analytics", `${uid}_link_${i}`));
+                    addLinkField(d.links[i].label, d.links[i].url, d.links[i].icon, cSnap.exists() ? cSnap.data().clicks : 0);
+                }
+            } else { addLinkField(); }
         }
-    };
 
-    document.getElementById('btn-auth').onclick = async () => {
-        const email = document.getElementById('email').value;
-        const pass = document.getElementById('pass').value;
-        try { await signInWithEmailAndPassword(auth, email, pass); }
-        catch { try { await createUserWithEmailAndPassword(auth, email, pass); } catch(e) { alert("Erro: " + e.message); } }
-    };
+        document.getElementById('save-btn').onclick = async () => {
+            const user = auth.currentUser;
+            const btn = document.getElementById('save-btn');
+            btn.innerText = "Salvando...";
+            const links = Array.from(document.querySelectorAll('.link-item')).map(it => ({
+                label: it.querySelector('.l-label').value,
+                url: it.querySelector('.l-url').value,
+                icon: it.querySelector('.l-icon').value
+            }));
+            try {
+                await setDoc(doc(db, "users", user.uid), {
+                    name: document.getElementById('p-name').value,
+                    desc: document.getElementById('p-desc').value,
+                    img: document.getElementById('p-img').value,
+                    color: document.getElementById('p-color').value,
+                    links: links
+                });
+                alert("✅ Publicado!");
+                location.reload();
+            } catch (e) { alert("Erro: " + e.message); }
+        };
 
-    document.getElementById('btn-logout').onclick = () => signOut(auth);
-    document.getElementById('add-link').onclick = () => addLinkField();
-</script>
+        document.getElementById('btn-auth').onclick = async () => {
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('pass').value;
+            try { await signInWithEmailAndPassword(auth, email, pass); }
+            catch { try { await createUserWithEmailAndPassword(auth, email, pass); } catch(e) { alert(e.message); } }
+        };
+
+        document.getElementById('btn-logout').onclick = () => signOut(auth);
+        document.getElementById('add-link').onclick = () => addLinkField();
+    </script>
 </body>
 </html>
