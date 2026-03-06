@@ -12,62 +12,62 @@
         .container { width: 100%; max-width: 500px; }
         .box { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 25px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
         .hidden { display: none; }
-        input, select, textarea { width: 100%; background: #030712; border: 1px solid var(--border); border-radius: 10px; padding: 12px; color: white; margin-bottom: 15px; outline: none; transition: 0.3s; }
-        input:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(59, 130, 246, 0.2); }
+        input, select, textarea { width: 100%; background: #030712; border: 1px solid var(--border); border-radius: 10px; padding: 12px; color: white; margin-bottom: 15px; outline: none; }
         label { font-size: 0.75rem; color: #94a3b8; margin-bottom: 5px; display: block; font-weight: 600; text-transform: uppercase; }
         .btn { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 1rem; }
         .btn-primary { background: var(--primary); color: white; }
-        .btn-primary:hover { background: #2563eb; transform: translateY(-2px); }
-        .url-display { background: rgba(59, 130, 246, 0.05); padding: 15px; border-radius: 12px; color: #60a5fa; font-size: 0.85rem; border: 1px dashed var(--primary); text-align: center; margin-bottom: 25px; word-break: break-all; }
-        .link-item { background: rgba(255,255,255,0.03); padding: 15px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 12px; position: relative; }
+        .url-display { background: rgba(59, 130, 246, 0.1); padding: 20px; border-radius: 15px; color: #fff; font-size: 0.9rem; border: 2px dashed var(--primary); text-align: center; margin-bottom: 25px; cursor: pointer; position: relative; }
+        .url-display:active { transform: scale(0.98); }
+        .url-display small { display: block; color: #94a3b8; margin-bottom: 8px; font-size: 0.7rem; text-transform: uppercase; }
+        .link-item { background: rgba(255,255,255,0.03); padding: 15px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 12px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div id="auth-screen" class="box">
-        <h2 style="margin-bottom: 20px;">Acesse sua Bio Pro</h2>
-        <input type="email" id="email" placeholder="Seu e-mail">
-        <input type="password" id="pass" placeholder="Sua senha">
-        <button class="btn btn-primary" id="btn-auth">Entrar no Sistema</button>
+        <h2 style="margin-bottom: 20px;">Aceder Bio Pro</h2>
+        <input type="email" id="email" placeholder="E-mail">
+        <input type="password" id="pass" placeholder="Senha">
+        <button class="btn btn-primary" id="btn-auth">Entrar</button>
     </div>
 
     <div id="editor-screen" class="box hidden">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h3 style="color: var(--primary)">Editor PowerCare</h3>
+            <h3 style="color: var(--primary)">PowerCare Editor</h3>
             <button id="btn-logout" style="color:#ff4444; background:none; border:none; cursor:pointer; font-weight:600;">Sair</button>
         </div>
 
-        <div class="url-display">
-            <p style="font-size: 0.65rem; color: #94a3b8; margin-bottom: 5px;">LINK PÚBLICO DA SUA BIO:</p>
-            <strong id="final-link">Carregando...</strong>
+        <div class="url-display" id="copy-link-btn">
+            <small>Clique para copiar o link da sua Bio:</small>
+            <strong id="final-link" style="color: #60a5fa; word-break: break-all;">A carregar...</strong>
         </div>
 
-        <label>URL da Foto (Avatar)</label>
-        <input type="text" id="p-img" placeholder="https://link-da-imagem.jpg">
+        <label>Foto do Perfil (URL)</label>
+        <input type="text" id="p-img" placeholder="https://imagem.jpg">
         
-        <label>Nome do Perfil</label>
-        <input type="text" id="p-name" placeholder="Ex: João Silva">
+        <label>Nome</label>
+        <input type="text" id="p-name">
         
-        <label>Descrição Curta</label>
-        <textarea id="p-desc" rows="2" placeholder="Ex: Especialista em Marketing Digital"></textarea>
+        <label>Descrição</label>
+        <textarea id="p-desc" rows="2"></textarea>
 
-        <label>Texto de Urgência (Topo)</label>
-        <input type="text" id="p-urgency" placeholder="Ex: 🔥 Últimas 3 vagas disponíveis!">
+        <label>Frase de Urgência (Topo)</label>
+        <input type="text" id="p-urgency" placeholder="Ex: 🔥 Últimas vagas!">
 
         <label>WhatsApp (Ex: 5511999999999)</label>
-        <input type="text" id="p-whatsapp" placeholder="Somente números">
+        <input type="text" id="p-whatsapp">
 
-        <label>Cor de Destaque (Neon)</label>
-        <input type="color" id="p-color" value="#3b82f6" style="height:50px; cursor:pointer; padding: 5px;">
+        <label>Cor Neon</label>
+        <input type="color" id="p-color" value="#3b82f6" style="height:50px; cursor:pointer;">
 
         <div style="display:flex; justify-content:space-between; align-items:center; margin:20px 0 10px;">
-            <span style="font-weight:bold">Botões de Links</span>
-            <button class="btn" id="add-link" style="width:auto; padding:8px 15px; background:var(--primary); color:white; font-size:0.8rem;">+ Adicionar</button>
+            <span style="font-weight:bold">Gestor de Links</span>
+            <button class="btn" id="add-link" style="width:auto; padding:8px 15px; background:var(--primary); color:white; font-size:0.8rem;">+ Novo Link</button>
         </div>
         <div id="links-container"></div>
 
-        <button class="btn btn-primary" id="save-btn" style="margin-top:20px;">🚀 Publicar Alterações</button>
+        <button class="btn btn-primary" id="save-btn" style="margin-top:20px;">🚀 Publicar Bio</button>
     </div>
 </div>
 
@@ -93,9 +93,18 @@
         if (user) {
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('editor-screen').classList.remove('hidden');
-            // Geração automática do link correto baseado na URL atual
-            const bioUrl = window.location.href.replace('admin.html', 'index.html') + `?u=${user.uid}`;
+            
+            // CONSTRUÇÃO DO LINK CORRETO
+            const currentPath = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
+            const bioUrl = `${currentPath}index.html?u=${user.uid}`;
             document.getElementById('final-link').innerText = bioUrl;
+            
+            // Função Copiar
+            document.getElementById('copy-link-btn').onclick = () => {
+                navigator.clipboard.writeText(bioUrl);
+                alert("Link copiado! Agora cole-o na Bio do seu Instagram.");
+            };
+
             loadData(user.uid);
         } else {
             document.getElementById('auth-screen').classList.remove('hidden');
@@ -112,13 +121,12 @@
                     <option value="fab fa-instagram" ${icon.includes('instagram')?'selected':''}>Instagram</option>
                     <option value="fab fa-whatsapp" ${icon.includes('whatsapp')?'selected':''}>WhatsApp</option>
                     <option value="fab fa-tiktok" ${icon.includes('tiktok')?'selected':''}>TikTok</option>
-                    <option value="fab fa-youtube" ${icon.includes('youtube')?'selected':''}>YouTube</option>
-                    <option value="fas fa-link" ${icon.includes('link')?'selected':''}>Outro Link</option>
+                    <option value="fas fa-link" ${icon.includes('link')?'selected':''}>Link</option>
                 </select>
                 <input type="text" class="l-label" placeholder="Título" value="${label}" style="flex:2; margin:0">
-                <button onclick="this.parentElement.parentElement.remove()" style="color:#ff4444; background:none; border:none; font-weight:bold; cursor:pointer; padding:0 5px;">X</button>
+                <button onclick="this.parentElement.parentElement.remove()" style="color:#ff4444; background:none; border:none; cursor:pointer;">X</button>
             </div>
-            <input type="text" class="l-url" placeholder="https://URL-DESTINO.com" value="${url}" style="margin:0">
+            <input type="text" class="l-url" placeholder="URL Destino" value="${url}" style="margin:0">
         `;
         document.getElementById('links-container').appendChild(div);
     }
@@ -154,15 +162,14 @@
             whatsapp: document.getElementById('p-whatsapp').value,
             links: links
         });
-        alert("✅ Bio publicada com sucesso!");
-        location.reload();
+        alert("✅ Bio atualizada com sucesso!");
     };
 
     document.getElementById('btn-auth').onclick = async () => {
         const email = document.getElementById('email').value;
         const pass = document.getElementById('pass').value;
         try { await signInWithEmailAndPassword(auth, email, pass); }
-        catch { await createUserWithEmailAndPassword(auth, email, pass); }
+        catch { try { await createUserWithEmailAndPassword(auth, email, pass); } catch(e) { alert(e.message); } }
     };
     document.getElementById('btn-logout').onclick = () => signOut(auth);
     document.getElementById('add-link').onclick = () => addLinkField();
