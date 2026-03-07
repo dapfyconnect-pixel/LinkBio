@@ -1,79 +1,3 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PowerCare Admin | Multi-User</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root { --bg: #030712; --card: #111827; --border: #1f2937; --primary: #3b82f6; --text: #f9fafb; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); color: var(--text); padding: 20px; display: flex; justify-content: center; min-height: 100vh; }
-        .container { width: 100%; max-width: 500px; }
-        .box { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 25px; margin-bottom: 20px; }
-        .hidden { display: none; }
-        input, textarea { width: 100%; background: #030712; border: 1px solid var(--border); border-radius: 10px; padding: 12px; color: white; margin-bottom: 15px; outline: none; }
-        label { font-size: 0.75rem; color: #94a3b8; margin-bottom: 5px; display: block; font-weight: 600; text-transform: uppercase; }
-        .btn { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn-primary { background: var(--primary); color: white; }
-        
-        /* CAIXA DO LINK PÚBLICO */
-        .url-display { 
-            background: rgba(59, 130, 246, 0.1); padding: 20px; border-radius: 15px; 
-            border: 2px dashed var(--primary); text-align: center; margin-bottom: 25px; 
-            cursor: pointer; transition: 0.2s;
-        }
-        .url-display:hover { background: rgba(59, 130, 246, 0.15); }
-        .url-display small { display: block; color: #94a3b8; margin-bottom: 8px; font-size: 0.7rem; }
-        .link-item { background: rgba(255,255,255,0.03); padding: 15px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 12px; }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <div id="auth-screen" class="box">
-        <h2 style="margin-bottom: 20px; text-align: center;">Entrar no Editor</h2>
-        <input type="email" id="email" placeholder="E-mail">
-        <input type="password" id="pass" placeholder="Senha">
-        <button class="btn btn-primary" id="btn-auth">Entrar / Criar Conta</button>
-    </div>
-
-    <div id="editor-screen" class="box hidden">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h3 style="color: var(--primary)">Editor PowerCare</h3>
-            <button id="btn-logout" style="color:#ff4444; background:none; border:none; cursor:pointer;">Sair</button>
-        </div>
-
-        <div class="url-display" id="copy-link-btn">
-            <small>ESTE É O LINK PARA A SUA BIO (CLIQUE PARA COPIAR):</small>
-            <strong id="final-link" style="color: #60a5fa; word-break: break-all; font-size: 0.85rem;">Gerando...</strong>
-        </div>
-
-        <label>Foto de Perfil (URL)</label>
-        <input type="text" id="p-img" placeholder="https://link-da-imagem.jpg">
-        
-        <label>Nome do Perfil</label>
-        <input type="text" id="p-name">
-        
-        <label>Bio / Descrição</label>
-        <textarea id="p-desc" rows="2"></textarea>
-
-        <label>WhatsApp (Ex: 5511999999999)</label>
-        <input type="text" id="p-whatsapp">
-
-        <label>Cor do Tema</label>
-        <input type="color" id="p-color" value="#3b82f6" style="height:50px; width:100%; cursor:pointer; background:none; border:none;">
-
-        <div style="display:flex; justify-content:space-between; align-items:center; margin:20px 0 10px;">
-            <span style="font-weight:bold">Links da Página</span>
-            <button class="btn" id="add-link" style="width:auto; padding:8px 15px; background:var(--primary); color:white; font-size:0.8rem;">+ Novo Link</button>
-        </div>
-        <div id="links-container"></div>
-
-        <button class="btn btn-primary" id="save-btn" style="margin-top:20px;">🚀 Guardar Alterações</button>
-    </div>
-</div>
-
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -92,79 +16,88 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
         if (user) {
-            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('editor-screen').classList.remove('hidden');
+
+            // CORREÇÃO DEFINITIVA DO LINK:
+            // Pega a URL atual, remove o "admin.html" e coloca "index.html"
+            let loc = window.location.href.split('?')[0]; // Remove query strings antigas
+            let baseURL = loc.substring(0, loc.lastIndexOf('/'));
+            const finalPublicLink = `${baseURL}/index.html?u=${user.uid}`;
             
-            // LÓGICA DO LINK PÚBLICO
-            const publicUrl = window.location.origin + window.location.pathname.replace('admin.html', 'index.html') + `?u=${user.uid}`;
-            document.getElementById('final-link').innerText = publicUrl;
+            document.getElementById('display-link').innerText = finalPublicLink;
             
-            document.getElementById('copy-link-btn').onclick = () => {
-                navigator.clipboard.writeText(publicUrl);
-                alert("Link público copiado! Use este link na sua Bio.");
+            document.getElementById('copy-btn').onclick = () => {
+                navigator.clipboard.writeText(finalPublicLink);
+                alert("Link da Bio copiado com sucesso!");
             };
 
-            loadData(user.uid);
+            // Carregar dados existentes
+            const snap = await getDoc(doc(db, "users", user.uid));
+            if (snap.exists()) {
+                const d = snap.data();
+                document.getElementById('in-name').value = d.name || "";
+                document.getElementById('in-desc').value = d.desc || "";
+                document.getElementById('in-img').value = d.img || "";
+                document.getElementById('in-wa').value = d.whatsapp || "";
+                document.getElementById('in-color').value = d.color || "#3b82f6";
+                document.getElementById('links-area').innerHTML = ""; // Limpa antes de carregar
+                (d.links || []).forEach(l => createLinkInput(l.label, l.url));
+            }
         } else {
-            document.getElementById('auth-screen').classList.remove('hidden');
+            document.getElementById('login-screen').classList.remove('hidden');
             document.getElementById('editor-screen').classList.add('hidden');
         }
     });
 
-    window.addLinkField = (label = "", url = "") => {
+    // Função para criar campos de link
+    window.createLinkInput = (label = "", url = "") => {
         const div = document.createElement('div');
-        div.className = 'link-item';
+        div.className = 'link-row';
         div.innerHTML = `
-            <input type="text" class="l-label" placeholder="Nome do Botão" value="${label}" style="margin-bottom:8px">
-            <div style="display:flex; gap:8px;">
-                <input type="text" class="l-url" placeholder="URL (https://...)" value="${url}" style="margin:0; flex:1">
-                <button onclick="this.parentElement.parentElement.remove()" style="color:#ff4444; background:none; border:none; cursor:pointer; font-weight:bold;">X</button>
-            </div>
+            <input type="text" class="l-name" placeholder="Título (ex: Instagram)" value="${label}" style="margin-bottom:5px">
+            <input type="text" class="l-url" placeholder="Link (https://...)" value="${url}" style="margin-bottom:0">
+            <button onclick="this.parentElement.remove()" style="color:#ff4444; background:none; border:none; font-size:0.7rem; margin-top:5px; cursor:pointer; font-weight:bold;">[ REMOVER ]</button>
         `;
-        document.getElementById('links-container').appendChild(div);
+        document.getElementById('links-area').appendChild(div);
     }
 
-    async function loadData(uid) {
-        const snap = await getDoc(doc(db, "users", uid));
-        if (snap.exists()) {
-            const d = snap.data();
-            document.getElementById('p-name').value = d.name || "";
-            document.getElementById('p-desc').value = d.desc || "";
-            document.getElementById('p-img').value = d.img || "";
-            document.getElementById('p-color').value = d.color || "#3b82f6";
-            document.getElementById('p-whatsapp').value = d.whatsapp || "";
-            document.getElementById('links-container').innerHTML = "";
-            (d.links || []).forEach(l => addLinkField(l.label, l.url));
-        } else { addLinkField(); }
-    }
+    document.getElementById('add-link-btn').onclick = () => createLinkInput();
 
-    document.getElementById('save-btn').onclick = async () => {
+    document.getElementById('save-data').onclick = async () => {
         const user = auth.currentUser;
-        const links = Array.from(document.querySelectorAll('.link-item')).map(it => ({
-            label: it.querySelector('.l-label').value,
-            url: it.querySelector('.l-url').value
+        if(!user) return;
+
+        const links = Array.from(document.querySelectorAll('.link-row')).map(r => ({
+            label: r.querySelector('.l-name').value,
+            url: r.querySelector('.l-url').value
         }));
+
         await setDoc(doc(db, "users", user.uid), {
-            name: document.getElementById('p-name').value,
-            desc: document.getElementById('p-desc').value,
-            img: document.getElementById('p-img').value,
-            color: document.getElementById('p-color').value,
-            whatsapp: document.getElementById('p-whatsapp').value,
+            name: document.getElementById('in-name').value,
+            desc: document.getElementById('in-desc').value,
+            img: document.getElementById('in-img').value,
+            whatsapp: document.getElementById('in-wa').value,
+            color: document.getElementById('in-color').value,
             links: links
         });
-        alert("✅ Publicado com sucesso!");
+        alert("✅ Perfil Publicado com Sucesso!");
     };
 
-    document.getElementById('btn-auth').onclick = async () => {
+    document.getElementById('btn-login').onclick = async () => {
         const email = document.getElementById('email').value;
         const pass = document.getElementById('pass').value;
-        try { await signInWithEmailAndPassword(auth, email, pass); }
-        catch { try { await createUserWithEmailAndPassword(auth, email, pass); } catch(e) { alert(e.message); } }
+        if(!email || !pass) return alert("Preencha todos os campos");
+        try { 
+            await signInWithEmailAndPassword(auth, email, pass); 
+        } catch (error) {
+            try { 
+                await createUserWithEmailAndPassword(auth, email, pass); 
+            } catch (err) { alert("Erro: " + err.message); }
+        }
     };
+
     document.getElementById('btn-logout').onclick = () => signOut(auth);
-    document.getElementById('add-link').onclick = () => addLinkField();
 </script>
-</body>
-</html>
